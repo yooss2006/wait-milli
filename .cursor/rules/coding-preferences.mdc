@@ -1,0 +1,63 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+## Coding Preferences - Code Style & Quality Standards
+
+### Core Principles
+- **Simplicity**: Always prioritize the simplest solution over complexity
+- **DRY (Don't Repeat Yourself)**: Avoid code duplication, reuse functionality
+- **Organization**: Keep files under 300 lines, refactor when needed
+- **Documentation**: After developing key components, modify '/docs/plan.md'
+
+### Import Paths
+- Always include 'src' in import paths from project root
+  - Correct: '@/src/features/article/api/getArticleBySlug'
+  - Incorrect: '@/features/article/api/getArticleBySlug'
+- Use absolute imports with '@/' prefix for project files
+- Group imports by: external → internal → types
+- Keep consistent import order across files
+
+### Page & Component Organization (FSD)
+- Page routes go in `src/app` directory
+- Page components go in `src/views` directory following FSD structure
+  - Correct: '@/src/views/articles/ui/ArticleDetailPage'
+  - Incorrect: Creating page components directly in `src/app`
+- Follow FSD layer hierarchy:
+  - views/ - Route pages and layouts
+  - widgets/ - Independent page blocks
+  - features/ - User interactions and business logic
+  - entities/ - Business entities
+  - shared/ - Reusable infrastructure and UI
+- Keep page components thin, delegate business logic to features layer
+
+### Code Structure
+- Use functional, declarative programming (avoid classes)
+- Favor composition over inheritance
+- Structure files: exports → subcomponents → helpers → types
+- Follow naming conventions:
+  - Use descriptive names with auxiliary verbs (isLoading, handleClick)
+  - Use lowercase with dashes for directories (components/auth-wizard)
+  - Prefer named exports for components
+- Apply RORO pattern (Receive Object, Return Object)
+
+### JavaScript/TypeScript
+- Use "function" keyword for pure functions, omit semicolons
+- Prefer interfaces over types, use maps instead of enums
+- Minimize conditional syntax:
+  - Avoid unnecessary curly braces
+  - Omit braces for single-line statements
+- Always start with proper TypeScript interfaces/types
+
+### Error Handling
+- Handle errors and edge cases first (early returns)
+- Place happy path last for better readability
+- Avoid nested if statements and unnecessary else blocks
+- Use guard clauses for preconditions
+
+### React Components
+- Write as functions (not arrow functions stored in constants)
+- Use declarative JSX
+- Extract static content to variables outside render functions
+- Place interfaces and types at file end
