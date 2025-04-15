@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>캐릭터 분배 화면</title>
+    <style>
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif; /* System fonts */
+        background-color: #f4f4f8; /* Slightly lighter background */
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .screen-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        height: 100vh; /* Full viewport height */
+        width: 100%; /* Full width */
+        max-width: 480px; /* Max width for mobile mock-up */
+        padding: 40px 30px 30px 30px; /* Adjusted padding */
+        box-sizing: border-box;
+        background-color: #ffffff; /* White background for the main content */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Apply consistent shadow */
+      }
+
+      .screen-title {
+        font-size: 1.6em; /* Larger font size for title */
+        font-weight: 700; /* Bolder weight for title */
+        color: #222;
+        margin-bottom: 15px; /* Title margin adjustment if needed */
+        text-align: center;
+        flex-shrink: 0;
+      }
+
+      .instructions {
+        font-size: 1em; /* Slightly smaller font size for description */
+        color: #555; /* Slightly lighter color for description */
+        margin-bottom: 30px; /* Instruction margin adjustment if needed */
+        text-align: center;
+        font-weight: 400; /* Normal weight */
+        flex-shrink: 0;
+        line-height: 1.5; /* Improve readability */
+      }
+
+      .character-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr); /* Keep 2 columns */
+        gap: 15px; /* Slightly reduce gap for consistency */
+        width: 100%;
+        margin-bottom: 30px; /* Grid margin adjustment if needed */
+        flex-grow: 1; /* Allow grid to take available space */
+        overflow-y: auto; /* Add scroll if content overflows */
+        padding: 5px; /* Small padding around the grid */
+
+        /* Hide scrollbar cross-browser */
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+      }
+
+      /* Hide scrollbar for WebKit browsers */
+      .character-grid::-webkit-scrollbar {
+        display: none;
+      }
+
+      .character-item {
+        border: 1px solid #e0e0e0; /* Lighter border */
+        padding: 16px; /* Padding already adjusted by user */
+        text-align: center;
+        border-radius: 10px; /* Match button radius */
+        background-color: #f9f9f9;
+        font-size: 1.05em; /* Adjusted font size */
+        font-weight: 500;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        aspect-ratio: 1 / 1; /* Maintain square aspect ratio */
+        cursor: pointer; /* Indicate items are selectable */
+        transition: background-color 0.2s ease, transform 0.1s ease; /* Smooth transitions */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08); /* Adjusted subtle shadow */
+      }
+
+      .character-item:hover {
+        background-color: #ececec; /* Slightly darker hover */
+      }
+      .character-item:active {
+        transform: scale(0.97); /* Press down effect */
+      }
+
+      .navigation {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        padding-top: 25px; /* Adjust top padding for separation */
+        border-top: 1px solid #eee; /* Separator line */
+        flex-shrink: 0; /* Prevent navigation from shrinking */
+      }
+
+      button {
+        padding: 14px 28px; /* Slightly larger padding */
+        border: none;
+        border-radius: 10px; /* Consistent rounded corners */
+        font-size: 1.05em;
+        font-weight: 600; /* Bolder text */
+        cursor: pointer;
+        background-color: #007aff; /* iOS blue */
+        color: white;
+        transition: background-color 0.2s ease, transform 0.1s ease;
+        flex-basis: 48%; /* Give buttons near equal width */
+        text-align: center;
+      }
+
+      button:active {
+        transform: scale(0.98); /* Press down effect */
+      }
+
+      button:hover {
+        background-color: #005ecb; /* Darker blue on hover */
+      }
+
+      button:disabled {
+        background-color: #d1d1d6; /* iOS disabled color */
+        cursor: not-allowed;
+      }
+
+      .prev-button {
+        background-color: #6c757d; /* Gray for previous button */
+      }
+
+      .prev-button:hover {
+        background-color: #5a6268;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="screen-container">
+      <div class="screen-title">동물 선택</div>
+      <div class="instructions">
+        참가자는 각자 마음에 드는<br />동물을 선택해주세요!
+      </div>
+
+      <div class="character-grid">
+        <!-- 예시 캐릭터 (텍스트) - 실제 앱에서는 동적으로 생성됩니다 -->
+        <div class="character-item">🐶<br />강아지</div>
+        <div class="character-item">🐱<br />고양이</div>
+        <div class="character-item">🐼<br />판다</div>
+        <div class="character-item">🦊<br />여우</div>
+        <div class="character-item">🐻<br />곰</div>
+        <div class="character-item">🐯<br />호랑이</div>
+        <!-- 필요에 따라 더 많은 캐릭터 아이템 추가 -->
+      </div>
+
+      <div class="navigation">
+        <button class="prev-button">이전</button>
+        <button class="next-button">다음</button>
+      </div>
+    </div>
+  </body>
+</html>

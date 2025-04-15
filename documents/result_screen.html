@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <title>결과 확인 화면 - 콩콩팥팥</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background-color: #ffffff;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      .screen-container {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        width: 100%;
+        max-width: 480px;
+        background-color: #ffffff;
+        box-sizing: border-box;
+        padding-bottom: env(safe-area-inset-bottom); /* 노치 디자인 대응 */
+        position: relative;
+      }
+
+      /* 헤더 영역 */
+      .header {
+        padding: 20px 16px;
+        text-align: center;
+        border-bottom: 1px solid #eeeeee;
+      }
+
+      .header-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333333;
+      }
+
+      .game-mode-info {
+        font-size: 14px;
+        color: #666666;
+        margin-top: 4px;
+      }
+
+      /* 결과 영역 */
+      .result-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* 결과 메시지 */
+      .result-announcement {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .result-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: #333333;
+        margin-bottom: 8px;
+      }
+
+      .result-subtitle {
+        font-size: 16px;
+        color: #666666;
+      }
+
+      /* 캐릭터 표시 영역 */
+      .result-characters {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 20px 0 40px 0;
+        flex-wrap: wrap;
+      }
+
+      .character-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0 15px;
+        animation: appearWithBounce 0.6s ease forwards;
+      }
+
+      .character-emoji {
+        font-size: 5em;
+        margin-bottom: 10px;
+        position: relative;
+      }
+
+      .winner .character-emoji::after {
+        content: "🏆";
+        position: absolute;
+        top: -15px;
+        right: -15px;
+        font-size: 0.4em;
+      }
+
+      .loser .character-emoji::after {
+        content: "😓";
+        position: absolute;
+        top: -15px;
+        right: -15px;
+        font-size: 0.4em;
+      }
+
+      .character-info {
+        text-align: center;
+      }
+
+      .character-name {
+        font-size: 16px;
+        font-weight: 500;
+        margin-bottom: 2px;
+      }
+
+      .character-score {
+        font-size: 18px;
+        font-weight: 600;
+        color: #007aff;
+      }
+
+      /* 점수 순위표 영역 */
+      .score-board {
+        width: 100%;
+        max-width: 340px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        border: 1px solid #e9ecef;
+        padding: 16px;
+        margin-bottom: 20px;
+      }
+
+      .score-board-title {
+        font-size: 15px;
+        font-weight: 600;
+        color: #333333;
+        margin-bottom: 10px;
+        text-align: center;
+      }
+
+      .score-list {
+        width: 100%;
+      }
+
+      .score-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid #e9ecef;
+      }
+
+      .score-item:last-child {
+        border-bottom: none;
+      }
+
+      .score-rank {
+        width: 30px;
+        font-size: 14px;
+        font-weight: 500;
+        color: #666666;
+        text-align: center;
+      }
+
+      .score-player {
+        flex: 1;
+        display: flex;
+        align-items: center;
+      }
+
+      .score-emoji {
+        font-size: 1.4em;
+        margin-right: 8px;
+      }
+
+      .score-name {
+        font-size: 14px;
+        color: #333333;
+      }
+
+      .score-value {
+        font-size: 16px;
+        font-weight: 600;
+        color: #007aff;
+        min-width: 50px;
+        text-align: right;
+      }
+
+      .score-item.highlighted {
+        background-color: #f0f8ff;
+        border-radius: 6px;
+        padding: 8px 10px;
+        margin: 2px 0;
+      }
+
+      /* 장식 효과 */
+      .confetti {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 10;
+        opacity: 0.7;
+      }
+
+      /* 하단 버튼 영역 */
+      .bottom-section {
+        padding: 16px;
+        background-color: #ffffff;
+        border-top: 1px solid #eeeeee;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 10px;
+      }
+
+      button {
+        flex: 1;
+        padding: 14px 0;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s ease, transform 0.1s ease;
+      }
+
+      button:active {
+        transform: scale(0.98);
+      }
+
+      .primary-button {
+        background-color: #007aff;
+        color: white;
+      }
+
+      .secondary-button {
+        background-color: #f2f2f7;
+        color: #333333;
+      }
+
+      /* 애니메이션 효과 */
+      @keyframes appearWithBounce {
+        0% {
+          transform: scale(0);
+          opacity: 0;
+        }
+        60% {
+          transform: scale(1.1);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .highlight-pulse {
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .animated-emoji {
+        display: inline-block;
+        animation: bounce 1s infinite alternate;
+      }
+
+      @keyframes bounce {
+        from {
+          transform: translateY(0);
+        }
+        to {
+          transform: translateY(-10px);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="screen-container">
+      <!-- 헤더 영역 -->
+      <div class="header">
+        <h1 class="header-title">게임 결과</h1>
+        <div class="game-mode-info" id="game-mode-text">패자 결정 모드</div>
+      </div>
+
+      <!-- 결과 표시 영역 -->
+      <div class="result-section" id="result-section">
+        <!-- 결과 발표 -->
+        <div class="result-announcement">
+          <h2 class="result-title">게임이 종료되었습니다!</h2>
+          <p class="result-subtitle" id="result-message">
+            다음 플레이어가 꼴등입니다
+          </p>
+        </div>
+
+        <!-- 우승/꼴등 캐릭터 표시 -->
+        <div class="result-characters" id="result-characters">
+          <!-- JavaScript로 동적 생성 -->
+        </div>
+
+        <!-- 점수 순위표 -->
+        <div class="score-board">
+          <div class="score-board-title">점수 순위</div>
+          <div class="score-list" id="score-list">
+            <!-- JavaScript로 동적 생성 -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 버튼 영역 -->
+      <div class="bottom-section">
+        <div class="button-group">
+          <button class="primary-button" id="restart-button">다시하기</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // DOM 요소
+        const gameModeText = document.getElementById("game-mode-text");
+        const resultMessage = document.getElementById("result-message");
+        const resultCharacters = document.getElementById("result-characters");
+        const scoreList = document.getElementById("score-list");
+        const restartButton = document.getElementById("restart-button");
+
+        // 게임 설정 (실제로는 로컬 스토리지나 URL 파라미터에서 가져와야 함)
+        const gameSettings = {
+          isWinnerMode: false, // false: 패자 결정, true: 승자 결정
+          allowRematch: true, // 재경기 가능 여부
+        };
+
+        // 플레이어 데이터 (실제로는 이전 화면에서 전달 받아야 함)
+        const players = [
+          { id: 1, char: "🐶", name: "강아지", score: 24 },
+          { id: 2, char: "🐱", name: "고양이", score: 0 },
+          { id: 3, char: "🐼", name: "판다", score: 18 },
+          { id: 4, char: "🦊", name: "여우", score: 32 },
+        ];
+
+        // 게임 모드 텍스트 설정
+        gameModeText.textContent = gameSettings.isWinnerMode
+          ? "승자 결정 모드"
+          : "패자 결정 모드";
+
+        // 결과 분석 및 표시
+        function displayResults() {
+          // 1. 점수로 정렬된 플레이어 배열 생성
+          let sortedPlayers;
+          if (gameSettings.isWinnerMode) {
+            // 승자 결정 모드 - 높은 점수가 상위에 오도록 정렬
+            sortedPlayers = [...players].sort((a, b) => b.score - a.score);
+            resultMessage.textContent =
+              "축하합니다! 다음 플레이어가 우승했습니다";
+          } else {
+            // 패자 결정 모드 - 낮은 점수가 상위에 오도록 정렬
+            sortedPlayers = [...players].sort((a, b) => a.score - b.score);
+            resultMessage.textContent = "아쉽네요! 다음 플레이어가 꼴등입니다";
+          }
+
+          // 2. 결과 캐릭터 표시 (승자 또는 패자)
+          let resultPlayers;
+
+          // 재경기 가능 옵션에 따라 단독 또는 공동 우승/꼴등 처리
+          if (gameSettings.allowRematch) {
+            // 재경기 가능 - 단독 우승/꼴등만 표시
+            resultPlayers = [sortedPlayers[0]];
+          } else {
+            // 재경기 불가능 - 동점자 모두 표시
+            const targetScore = sortedPlayers[0].score;
+            resultPlayers = sortedPlayers.filter(
+              (p) => p.score === targetScore
+            );
+
+            // 2명 이상이면 공동 우승/꼴등 메시지 수정
+            if (resultPlayers.length > 1) {
+              if (gameSettings.isWinnerMode) {
+                resultMessage.textContent =
+                  "축하합니다! 다음 플레이어들이 공동 우승했습니다";
+              } else {
+                resultMessage.textContent =
+                  "아쉽네요! 다음 플레이어들이 공동 꼴등입니다";
+              }
+            }
+          }
+
+          // 결과 캐릭터 렌더링
+          resultCharacters.innerHTML = "";
+          resultPlayers.forEach((player) => {
+            const characterItem = document.createElement("div");
+            characterItem.className = `character-item ${
+              gameSettings.isWinnerMode ? "winner" : "loser"
+            }`;
+
+            characterItem.innerHTML = `
+              <div class="character-emoji highlight-pulse">${player.char}</div>
+              <div class="character-info">
+                <div class="character-name">${player.name}</div>
+                <div class="character-score">${player.score}점</div>
+              </div>
+            `;
+
+            resultCharacters.appendChild(characterItem);
+          });
+
+          // 3. 전체 점수 순위표 렌더링
+          scoreList.innerHTML = "";
+          sortedPlayers.forEach((player, index) => {
+            const scoreItem = document.createElement("div");
+
+            // 결과 플레이어(승자/패자) 강조
+            const isResultPlayer = resultPlayers.some(
+              (p) => p.id === player.id
+            );
+            scoreItem.className = `score-item ${
+              isResultPlayer ? "highlighted" : ""
+            }`;
+
+            // 순위 표시 (동점자는 같은 순위 부여)
+            let rankText;
+
+            // 승자/패자 결정 모드에 따라 순위 표시 방식 변경
+            if (gameSettings.isWinnerMode) {
+              // 승자 결정 모드 - 점수 높은 순서대로 1위, 2위...
+              if (
+                index > 0 &&
+                player.score === sortedPlayers[index - 1].score
+              ) {
+                // 이전 플레이어와 점수가 같으면 같은 순위
+                rankText = index + 1 - 1 + "위"; // 동점자는 같은 순위
+              } else {
+                rankText = index + 1 + "위";
+              }
+            } else {
+              // 패자 결정 모드 - 점수 낮은 순서대로 꼴등, 3등, 2등, 1등...
+              // 정렬은 이미 오름차순(낮은 점수 순)으로 되어 있으므로
+              // 실제 순위는 전체 플레이어 수에서 현재 인덱스를 빼서 계산
+              const totalPlayers = players.length;
+              const actualRank = totalPlayers - index;
+
+              if (
+                index > 0 &&
+                player.score === sortedPlayers[index - 1].score
+              ) {
+                // 이전 플레이어와 점수가 같으면 같은 순위
+                const prevRank = totalPlayers - (index - 1);
+                rankText = prevRank + "위";
+              } else {
+                rankText = actualRank + "위";
+              }
+            }
+
+            scoreItem.innerHTML = `
+              <div class="score-rank">${rankText}</div>
+              <div class="score-player">
+                <span class="score-emoji">${player.char}</span>
+                <span class="score-name">${player.name}</span>
+              </div>
+              <div class="score-value">${player.score}점</div>
+            `;
+
+            scoreList.appendChild(scoreItem);
+          });
+
+          // 4. 시각적 효과 추가 (우승자가 있는 경우만)
+          if (gameSettings.isWinnerMode) {
+            addConfettiEffect();
+          }
+        }
+
+        // 우승 축하 효과 (간단한 색종이 효과)
+        function addConfettiEffect() {
+          // 실제 앱에서는 lottie-react-native 같은 라이브러리 사용 권장
+          const confetti = document.createElement("div");
+          confetti.className = "confetti";
+
+          // 간단한 색종이 대신 이모지 사용
+          const emojis = ["🎉", "🎊", "✨", "🥳", "🎯", "🏆"];
+          let confettiHTML = "";
+
+          for (let i = 0; i < 30; i++) {
+            const randomEmoji =
+              emojis[Math.floor(Math.random() * emojis.length)];
+            const left = Math.random() * 100;
+            const animationDelay = Math.random() * 5;
+
+            confettiHTML += `
+              <div class="animated-emoji" style="
+                position: absolute; 
+                left: ${left}%; 
+                top: -20px; 
+                animation-delay: ${animationDelay}s;
+                font-size: ${Math.random() * 20 + 20}px;
+              ">${randomEmoji}</div>
+            `;
+          }
+
+          confetti.innerHTML = confettiHTML;
+          document.getElementById("result-section").appendChild(confetti);
+        }
+
+        // 다시하기 버튼 클릭 이벤트
+        restartButton.addEventListener("click", () => {
+          // 게임 준비 화면으로 이동
+          alert("게임 준비 화면으로 이동합니다");
+          window.location.href = "game_preparation_screen.html";
+        });
+
+        // 초기화 - 결과 표시
+        displayResults();
+      });
+    </script>
+  </body>
+</html>

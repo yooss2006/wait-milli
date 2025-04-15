@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <title>게임 진행 화면 - 콩콩팥팥</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        background-color: #ffffff;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      .screen-container {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        width: 100%;
+        max-width: 480px;
+        background-color: #ffffff;
+        box-sizing: border-box;
+        padding-bottom: env(safe-area-inset-bottom); /* 노치 디자인 대응 */
+        position: relative;
+      }
+
+      /* 상단 섹션 - 플레이어 목록과 게임 영역 */
+      .top-section {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+        border-bottom: 1px solid #eeeeee;
+      }
+
+      /* 하단 섹션 - 버튼 영역 */
+      .bottom-section {
+        width: 100%;
+        padding: 12px 16px 16px 16px;
+        background-color: #ffffff;
+      }
+
+      /* 왼쪽 섹션: 플레이어 목록 */
+      .player-list-section {
+        width: 40%;
+        border-right: 1px solid #eeeeee;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .player-list-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #333333;
+        text-align: center;
+        padding: 16px 8px 12px 8px;
+        border-bottom: 1px solid #f0f0f0;
+      }
+
+      .player-list {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        overflow-y: auto;
+        padding: 4px 0;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+      .player-list::-webkit-scrollbar {
+        display: none;
+      }
+
+      .player-item {
+        display: flex;
+        align-items: center;
+        padding: 10px 8px;
+        margin: 3px 6px;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+        border: 1px solid transparent;
+        transition: all 0.2s ease;
+      }
+
+      .player-item.current-turn {
+        background-color: #e7f3ff;
+        border-color: #c7e1ff;
+      }
+
+      .player-item.upcoming-turn {
+        opacity: 0.7;
+        background-color: #f0f0f0;
+      }
+
+      .player-item.finished-turn {
+        background-color: #f0f0f0;
+        opacity: 0.9;
+      }
+
+      .player-item.tie-player {
+        background-color: #fff3cd;
+        border-color: #ffecb5;
+      }
+
+      .player-item.inactive {
+        opacity: 0.5;
+      }
+
+      .player-char {
+        font-size: 1.6em;
+        margin-right: 8px;
+        width: 28px;
+        text-align: center;
+      }
+
+      .player-info {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+      }
+
+      .player-name {
+        font-size: 13px;
+        font-weight: 500;
+        color: #333333;
+        margin-bottom: 2px;
+      }
+
+      .player-score {
+        font-size: 15px;
+        font-weight: 600;
+        color: #007aff;
+      }
+
+      .player-score:empty::after {
+        content: "-";
+        color: #bbbbbb;
+      }
+
+      /* 오른쪽 섹션: 게임 영역 */
+      .game-section {
+        width: 60%;
+        padding: 16px 12px 10px 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        overflow: hidden;
+      }
+
+      .game-mode-info {
+        font-size: 12px;
+        color: #666666;
+        margin-bottom: 12px;
+        background-color: #f5f5f5;
+        padding: 6px 10px;
+        border-radius: 6px;
+        width: 100%;
+        text-align: center;
+      }
+
+      /* 스톱워치 표시 */
+      .stopwatch-display {
+        font-size: 3.3em;
+        font-weight: 300;
+        color: #222222;
+        margin: 5px 0 20px 0;
+        font-family: "SF Mono", "Courier New", monospace;
+        letter-spacing: 2px;
+        text-align: center;
+      }
+
+      /* 점수판 표시 */
+      .scoreboard {
+        width: 100%;
+        background-color: #f8f9fa;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid #e9ecef;
+        margin-bottom: 10px;
+      }
+
+      .scoreboard-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        padding: 0 8px;
+      }
+
+      .scoreboard-row:last-child {
+        margin-bottom: 0;
+        padding-top: 10px;
+        border-top: 1px solid #e9ecef;
+      }
+
+      .scoreboard-row .label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #555555;
+        text-align: left;
+      }
+
+      .scoreboard-row span:not(.label) {
+        font-size: 16px;
+        font-weight: 600;
+        color: #007aff;
+        min-width: 30px;
+        text-align: right;
+      }
+
+      .scoreboard-row:last-child span:not(.label) {
+        color: #28a745;
+      }
+
+      .scoreboard-row span:not(.label):empty::after {
+        content: "-";
+        color: #bbbbbb;
+      }
+
+      /* 버튼 영역 */
+      .button-area {
+        width: 100%;
+      }
+
+      button {
+        width: 100%;
+        padding: 14px 0;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        background-color: #007aff;
+        color: white;
+        transition: background-color 0.2s ease, transform 0.1s ease;
+      }
+
+      button:active {
+        transform: scale(0.98);
+      }
+
+      button:disabled {
+        background-color: #c7c7cc;
+        opacity: 0.8;
+      }
+
+      #rematch-button {
+        background-color: #ff9500;
+      }
+
+      /* 버튼 가시성 관리 */
+      #start-button,
+      #stop-button,
+      #next-player-button,
+      #results-button,
+      #rematch-button {
+        display: none;
+      }
+
+      .rematch-info {
+        font-size: 13px;
+        color: #ff9500;
+        text-align: center;
+        margin-top: 8px;
+        display: none;
+      }
+
+      @media (max-height: 667px) {
+        /* 아이폰 8 이하 크기 대응 */
+        .stopwatch-display {
+          font-size: 3em;
+          margin: 0 0 15px 0;
+        }
+
+        .scoreboard {
+          padding: 10px;
+        }
+
+        .player-item {
+          padding: 8px 6px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="screen-container">
+      <div class="top-section">
+        <div class="player-list-section">
+          <div class="player-list-title">플레이어 순서</div>
+          <div class="player-list">
+            <!-- Player items populated by JS -->
+          </div>
+        </div>
+        <div class="game-section">
+          <div class="game-mode-info">
+            게임 모드: <span id="game-mode-text">패자 결정 모드</span>
+          </div>
+          <div class="stopwatch-display">00:00</div>
+          <div class="scoreboard">
+            <div class="scoreboard-row">
+              <span class="label">첫번째 :</span>
+              <span id="digit1"></span>
+            </div>
+            <div class="scoreboard-row">
+              <span class="label">두번째 :</span>
+              <span id="digit2"></span>
+            </div>
+            <div class="scoreboard-row">
+              <span class="label">결과 :</span>
+              <span id="result"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bottom-section">
+        <div class="button-area">
+          <button id="start-button">시작하기</button>
+          <button id="stop-button">정지하기</button>
+          <button id="next-player-button">다음 플레이어</button>
+          <button id="results-button">결과 보기</button>
+          <button id="rematch-button">재경기 시작</button>
+        </div>
+        <div class="rematch-info" id="rematch-info">
+          동점자 재경기가 진행됩니다
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // --- DOM Elements ---
+        const playerListEl = document.querySelector(".player-list");
+        const stopwatchDisplay = document.querySelector(".stopwatch-display");
+        const digit1El = document.getElementById("digit1");
+        const digit2El = document.getElementById("digit2");
+        const resultEl = document.getElementById("result");
+        const gameModeText = document.getElementById("game-mode-text");
+        const startButton = document.getElementById("start-button");
+        const stopButton = document.getElementById("stop-button");
+        const nextPlayerButton = document.getElementById("next-player-button");
+        const resultsButton = document.getElementById("results-button");
+        const rematchButton = document.getElementById("rematch-button");
+        const rematchInfo = document.getElementById("rematch-info");
+
+        // --- Game Settings & State ---
+        // 이전 화면에서 가져온 설정 (실제로는 URL 파라미터나 로컬 스토리지를 통해 가져옴)
+        // PRD: 초기값은 패자 결정 방식, 재경기 가능
+        const gameSettings = {
+          isWinnerMode: false, // false: 패자 결정, true: 승자 결정
+          allowRematch: true, // 동점자 재경기 허용 여부
+        };
+
+        // 게임 모드 설정 UI 업데이트
+        gameModeText.textContent = gameSettings.isWinnerMode
+          ? "승자 결정 모드"
+          : "패자 결정 모드";
+
+        // PRD Step Game Order: "게임 시작 시 플레이어 순서가 랜덤으로 결정됩니다."
+        // Mockup Note: Using fixed order for simplicity. A real implementation would shuffle.
+        const initialPlayers = [
+          { id: 1, char: "🐶", name: "강아지", score: null },
+          { id: 2, char: "🐱", name: "고양이", score: null },
+          { id: 3, char: "🐼", name: "판다", score: null },
+          { id: 4, char: "🦊", name: "여우", score: null },
+          // Add more players if needed, up to 6-8 based on PRD
+        ];
+
+        let players = JSON.parse(JSON.stringify(initialPlayers)); // Deep copy for potential reset
+        let currentPlayerIndex = 0;
+        let currentStopwatchState = "idle";
+        let tempDigit1 = null; // To store the first digit
+        let stopwatchInterval = null; // Variable to hold the interval ID
+        let startTime = 0; // Variable to store start time
+        let elapsedTime = 0; // Variable to store elapsed time on stop
+        let isRematch = false; // 현재 게임이 재경기인지 여부
+        let tiePlayers = []; // 동점자 플레이어 목록
+        let originalPlayers = []; // 원래 플레이어 목록 (재경기 전 상태 저장용)
+
+        // --- Helper Functions ---
+        function assignPlayerStates() {
+          players.forEach((player, index) => {
+            if (isRematch) {
+              // 재경기 시에는 동점자만 활성화, 나머지는 비활성화
+              if (tiePlayers.some((p) => p.id === player.id)) {
+                if (index === currentPlayerIndex && player.score === null) {
+                  player.state = "current-turn";
+                } else if (player.score !== null) {
+                  player.state = "finished-turn tie-player";
+                } else {
+                  player.state = "upcoming-turn tie-player";
+                }
+              } else {
+                player.state = "inactive";
+              }
+            } else {
+              // 일반 게임
+              if (index === currentPlayerIndex && player.score === null) {
+                player.state = "current-turn";
+              } else if (player.score !== null) {
+                player.state = "finished-turn";
+              } else {
+                player.state = "upcoming-turn";
+              }
+            }
+          });
+        }
+
+        function renderPlayerList() {
+          assignPlayerStates(); // Update states before rendering
+          playerListEl.innerHTML = ""; // Clear list
+          players.forEach((player) => {
+            const item = document.createElement("div");
+            item.classList.add("player-item");
+            // 플레이어 상태 클래스 추가 (current-turn, upcoming-turn, finished-turn, tie-player, inactive 등)
+            if (player.state) {
+              player.state.split(" ").forEach((state) => {
+                item.classList.add(state);
+              });
+            }
+            item.dataset.playerId = player.id;
+
+            item.innerHTML = `
+              <span class="player-char">${player.char}</span>
+              <div class="player-info">
+                <span class="player-name">${player.name}</span>
+                <span class="player-score">${player.score ?? ""}</span>
+              </div>
+            `;
+            playerListEl.appendChild(item);
+          });
+        }
+
+        function updateButtonVisibility() {
+          // 모든 버튼 숨기기
+          startButton.style.display = "none";
+          stopButton.style.display = "none";
+          nextPlayerButton.style.display = "none";
+          resultsButton.style.display = "none";
+          rematchButton.style.display = "none";
+          rematchInfo.style.display = "none";
+
+          switch (currentStopwatchState) {
+            // 첫 번째 시작 또는 두 번째 시작 전
+            case "idle":
+            case "stopped1":
+              startButton.style.display = "block";
+              break;
+            // 실행 중
+            case "running1":
+            case "running2":
+              stopButton.style.display = "block";
+              break;
+            // 두 번째 정지 후
+            case "stopped2":
+              if (
+                currentPlayerIndex < players.length - 1 &&
+                !checkForImmediateGameEnd()
+              ) {
+                // 다음 플레이어 있음
+                nextPlayerButton.style.display = "block";
+              } else {
+                // 마지막 플레이어 또는 모든 동점자의 턴이 끝났을 때
+                if (isAllPlayersFinished()) {
+                  // 동점자 처리
+                  const tiedPlayers = findTiedPlayers();
+                  if (
+                    tiedPlayers.length > 1 &&
+                    gameSettings.allowRematch &&
+                    !isRematch
+                  ) {
+                    // 동점자가 있고 재경기 가능한 경우
+                    rematchButton.style.display = "block";
+                    rematchInfo.style.display = "block";
+                  } else {
+                    // 동점자가 없거나 재경기 불가능한 경우
+                    resultsButton.style.display = "block";
+                  }
+                } else {
+                  // 아직 모든 플레이어가 게임을 마치지 않았음 (재경기 중)
+                  nextPlayerButton.style.display = "block";
+                }
+              }
+              break;
+          }
+        }
+
+        function formatTime(timeMs) {
+          // 초 계산 (0-59)
+          const seconds = Math.floor(timeMs / 1000) % 60;
+          // 밀리초는 00-99 사이 두 자리수로 표시
+          const milliseconds = Math.floor((timeMs % 1000) / 10);
+
+          // 두 자리 숫자 형식으로 변환 (예: 05:78)
+          return `${String(seconds).padStart(2, "0")}:${String(
+            milliseconds
+          ).padStart(2, "0")}`;
+        }
+
+        function resetGameAreaForNextPlayer() {
+          if (stopwatchInterval) {
+            clearInterval(stopwatchInterval);
+            stopwatchInterval = null;
+          }
+          startTime = 0;
+          elapsedTime = 0;
+          stopwatchDisplay.textContent = "00:00";
+          digit1El.textContent = "";
+          digit2El.textContent = "";
+          resultEl.textContent = "";
+          tempDigit1 = null;
+          currentStopwatchState = "idle";
+          updateButtonVisibility();
+        }
+
+        // 밀리초 마지막 자리 숫자 가져오기 (점수 계산용)
+        function getLastMillisecondDigit(timeMs) {
+          // 밀리초 값 얻기 (0-999)
+          const milliseconds = timeMs % 1000;
+          // 밀리초의 마지막 자리 숫자 얻기 (0-9)
+          return Math.floor((milliseconds % 100) / 10);
+        }
+
+        // 모든 플레이어가 게임을 마쳤는지 확인
+        function isAllPlayersFinished() {
+          if (isRematch) {
+            // 재경기 중인 경우는 tiePlayers 배열의 모든 플레이어가 게임을 마쳤는지 확인
+            return tiePlayers.every((p) => {
+              const player = players.find((player) => player.id === p.id);
+              return player && player.score !== null;
+            });
+          } else {
+            // 일반 게임의 경우 모든 플레이어가 게임을 마쳤는지 확인
+            return players.every((p) => p.score !== null);
+          }
+        }
+
+        // 동점자 찾기
+        function findTiedPlayers() {
+          if (players.some((p) => p.score === null)) {
+            // 아직 모든 플레이어가 게임을 마치지 않았으면 빈 배열 반환
+            return [];
+          }
+
+          // 설정에 따라 최고 점수 또는 최저 점수 찾기
+          let targetScore;
+          let tiedPlayers = [];
+
+          if (gameSettings.isWinnerMode) {
+            // 승자 결정 모드 - 최고 점수 찾기
+            targetScore = Math.max(...players.map((p) => p.score));
+            tiedPlayers = players.filter((p) => p.score === targetScore);
+          } else {
+            // 패자 결정 모드 - 최저 점수 찾기
+            targetScore = Math.min(...players.map((p) => p.score));
+            tiedPlayers = players.filter((p) => p.score === targetScore);
+          }
+
+          return tiedPlayers;
+        }
+
+        // 즉시 게임 종료 조건 확인 (재경기 중 동점자가 1명만 남은 경우)
+        function checkForImmediateGameEnd() {
+          if (!isRematch) return false;
+
+          // 점수가 있는 플레이어 필터링
+          const playersWithScore = players.filter(
+            (p) => tiePlayers.some((tp) => tp.id === p.id) && p.score !== null
+          );
+
+          if (playersWithScore.length < 2) return false;
+
+          // 점수로 정렬
+          const sortedPlayers = [...playersWithScore].sort((a, b) => {
+            if (gameSettings.isWinnerMode) {
+              return b.score - a.score; // 내림차순
+            } else {
+              return a.score - b.score; // 오름차순
+            }
+          });
+
+          // 1등(승자 모드) 또는 꼴등(패자 모드)이 단독으로 결정되었는지 확인
+          const topPlayer = sortedPlayers[0];
+          const secondPlayer = sortedPlayers[1];
+
+          return topPlayer.score !== secondPlayer.score;
+        }
+
+        // 재경기 세팅
+        function setupRematch() {
+          // 원래 플레이어 목록 보관
+          originalPlayers = JSON.parse(JSON.stringify(players));
+
+          // 동점자 필터링
+          tiePlayers = findTiedPlayers();
+
+          // 동점자들의 점수 초기화
+          players.forEach((p) => {
+            if (tiePlayers.some((tp) => tp.id === p.id)) {
+              p.score = null;
+            }
+          });
+
+          // 첫 번째 동점자부터 시작
+          currentPlayerIndex = players.findIndex((p) =>
+            tiePlayers.some((tp) => tp.id === p.id)
+          );
+          isRematch = true;
+
+          // 게임 영역 초기화
+          resetGameAreaForNextPlayer();
+          renderPlayerList();
+        }
+
+        // --- Event Listeners ---
+        startButton.addEventListener("click", () => {
+          // 기존 인터벌이 있으면 제거
+          if (stopwatchInterval) {
+            clearInterval(stopwatchInterval);
+            stopwatchInterval = null;
+          }
+
+          if (currentStopwatchState === "idle") {
+            // 첫 번째 시작
+            currentStopwatchState = "running1";
+            startTime = Date.now();
+            elapsedTime = 0;
+          } else if (currentStopwatchState === "stopped1") {
+            // 두 번째 시작
+            currentStopwatchState = "running2";
+            startTime = Date.now(); // 새로운 시작 시간 설정
+            elapsedTime = 0; // 두 번째 측정은 0부터 시작
+          }
+
+          // 스톱워치 표시 업데이트를 위한 인터벌 설정
+          stopwatchInterval = setInterval(() => {
+            const now = Date.now();
+            const currentElapsed = now - startTime;
+            stopwatchDisplay.textContent = formatTime(currentElapsed);
+          }, 20); // 부드러운 밀리초 업데이트를 위해 짧은 간격 설정
+
+          updateButtonVisibility();
+        });
+
+        stopButton.addEventListener("click", () => {
+          // 인터벌이 있으면 멈춤
+          if (stopwatchInterval) {
+            clearInterval(stopwatchInterval);
+            stopwatchInterval = null;
+          }
+
+          // 현재 경과 시간 계산
+          const stopTime = Date.now();
+          elapsedTime = stopTime - startTime;
+
+          // 최종 시간 표시
+          stopwatchDisplay.textContent = formatTime(elapsedTime);
+
+          // 마지막 밀리초 자리 숫자 가져오기 (0-9)
+          const lastDigit = getLastMillisecondDigit(elapsedTime);
+
+          if (currentStopwatchState === "running1") {
+            // 첫 번째 정지
+            tempDigit1 = lastDigit;
+            digit1El.textContent = tempDigit1;
+            currentStopwatchState = "stopped1";
+          } else if (currentStopwatchState === "running2") {
+            // 두 번째 정지
+            const digit2 = lastDigit;
+            digit2El.textContent = digit2;
+
+            // 점수 계산
+            const score = tempDigit1 * digit2;
+            // 결과 표시 형식 변경 - "첫번째 x 두번째 = 결과" 형식으로 표시
+            resultEl.textContent = `${tempDigit1} x ${digit2} = ${score}`;
+
+            // 플레이어 점수 업데이트
+            players[currentPlayerIndex].score = score;
+            currentStopwatchState = "stopped2";
+            renderPlayerList();
+          }
+
+          updateButtonVisibility();
+        });
+
+        nextPlayerButton.addEventListener("click", () => {
+          // 다음 플레이어를 찾기 위한 변수
+          let nextPlayerFound = false;
+          let initialIndex = currentPlayerIndex; // 초기 인덱스 저장
+
+          // 현재 인덱스부터 시작해서 다음 플레이어 찾기
+          while (!nextPlayerFound) {
+            currentPlayerIndex++;
+
+            // 배열 범위를 넘어가면 처음부터 다시 시작
+            if (currentPlayerIndex >= players.length) {
+              currentPlayerIndex = 0;
+            }
+
+            // 원래 위치로 돌아왔으면 모든 플레이어 탐색 완료
+            if (currentPlayerIndex === initialIndex) {
+              break;
+            }
+
+            const currentPlayer = players[currentPlayerIndex];
+
+            // 재경기 중이면 동점자만 고려
+            if (isRematch) {
+              if (
+                tiePlayers.some((p) => p.id === currentPlayer.id) &&
+                currentPlayer.score === null
+              ) {
+                nextPlayerFound = true;
+              }
+            } else {
+              // 일반 게임에서는 점수가 없는 플레이어 선택
+              if (currentPlayer.score === null) {
+                nextPlayerFound = true;
+              }
+            }
+          }
+
+          renderPlayerList(); // 플레이어 상태 업데이트 (현재, 예정, 완료)
+          resetGameAreaForNextPlayer(); // 새 플레이어를 위한 오른쪽 패널 초기화
+        });
+
+        resultsButton.addEventListener("click", () => {
+          // 결과 판정
+          let resultMessage = "";
+          let tiedPlayers = findTiedPlayers();
+
+          if (gameSettings.isWinnerMode) {
+            // 승자 결정 모드
+            const maxScore = Math.max(...players.map((p) => p.score));
+            const winners = players.filter((p) => p.score === maxScore);
+
+            if (winners.length === 1) {
+              resultMessage = `게임 종료! 최고 점수는 ${winners[0].name} (${winners[0].score}점) 입니다!`;
+            } else {
+              const winnerNames = winners.map((p) => p.name).join(", ");
+              resultMessage = `게임 종료! 공동 우승: ${winnerNames} (${maxScore}점)`;
+            }
+          } else {
+            // 패자 결정 모드
+            const minScore = Math.min(...players.map((p) => p.score));
+            const losers = players.filter((p) => p.score === minScore);
+
+            if (losers.length === 1) {
+              resultMessage = `게임 종료! 최저 점수는 ${losers[0].name} (${losers[0].score}점) 입니다!`;
+            } else {
+              const loserNames = losers.map((p) => p.name).join(", ");
+              resultMessage = `게임 종료! 공동 꼴등: ${loserNames} (${minScore}점)`;
+            }
+          }
+
+          alert(`${resultMessage}\n(결과 화면으로 이동합니다)`);
+          // TODO: Navigate to Result Screen (PRD 4)
+        });
+
+        rematchButton.addEventListener("click", () => {
+          setupRematch();
+          updateButtonVisibility();
+        });
+
+        // --- Initial Setup ---
+        renderPlayerList();
+        updateButtonVisibility();
+      });
+    </script>
+  </body>
+</html>

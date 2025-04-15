@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>콩콩팥팥 게임 - 게임 준비</title>
+    <!-- 외부 CSS 파일 연결 -->
+    <style>
+      /* game_preparation_screen.css */
+
+      /* 기본 스타일 초기화 */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        /* align-items: center; Removed or adjust as needed */
+        min-height: 100vh;
+        background-color: #f4f4f8; /* 통일된 배경색 */
+      }
+
+      .container {
+        background-color: white;
+        padding: 40px 30px 30px 30px; /* Adjusted padding (top, sides, bottom) */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        width: 100%; /* Use full width up to max-width */
+        max-width: 480px;
+        height: 100vh; /* Make container full height */
+        display: flex; /* Enable flexbox for vertical layout */
+        flex-direction: column; /* Stack children vertically */
+        justify-content: space-between; /* Space out title, control, button */
+        box-sizing: border-box; /* Include padding in height/width */
+      }
+
+      .screen-title {
+        font-size: 1.6em;
+        font-weight: 700;
+        color: #222;
+        margin-bottom: 30px; /* Adjusted margin */
+        flex-shrink: 0; /* Prevent shrinking */
+      }
+
+      .setup-section {
+        margin-bottom: 25px;
+        text-align: left;
+      }
+
+      .setup-title {
+        font-size: 1.25em;
+        font-weight: 600;
+        color: #444;
+        margin-bottom: 15px;
+      }
+
+      .player-count-control {
+        display: flex;
+        justify-content: center; /* Center horizontally */
+        align-items: center; /* Center vertically */
+        margin-bottom: 10px; /* Adjusted margin */
+        padding: 0 20px; /* 내부 여백으로 숫자와 화살표 간격 조절 */
+      }
+
+      .arrow-button {
+        background: none;
+        border: none;
+        font-size: 2.5rem; /* 화살표 크기 */
+        color: #007aff; /* 포인트 색상 (파란색 계열) */
+        cursor: pointer;
+        padding: 10px; /* 클릭 영역 확보 */
+        line-height: 1; /* 수직 정렬 도움 */
+        transition: opacity 0.2s ease-in-out, color 0.2s ease-in-out; /* 부드러운 전환 효과 */
+        -webkit-tap-highlight-color: transparent; /* 모바일 탭 하이라이트 제거 */
+        user-select: none; /* 텍스트 선택 방지 */
+      }
+
+      .arrow-button:disabled {
+        color: #cccccc; /* 비활성화 시 연한 회색 */
+        cursor: default;
+        opacity: 0.6; /* 시각적으로 비활성화 표시 */
+      }
+
+      #player-count {
+        font-size: 3rem; /* 인원수 숫자 크기 */
+        font-weight: 600; /* 굵게 표시 */
+        color: #333;
+        min-width: 60px; /* 숫자가 변경되어도 레이아웃 흔들림 방지 */
+        text-align: center;
+        margin: 0 20px; /* 좌우 여백 추가하여 화살표와의 간격 확보 */
+      }
+
+      .game-mode-control {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        padding: 0 10px;
+      }
+
+      .game-mode-button {
+        padding: 12px 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: #f8f8f8;
+        font-size: 1.05em;
+        font-weight: 500;
+        color: #555;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        flex: 1;
+        margin: 0 5px;
+      }
+
+      .game-mode-button.active {
+        background-color: #007aff;
+        color: white;
+        border-color: #007aff;
+      }
+
+      .toggle-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px 10px;
+      }
+
+      .toggle-label {
+        font-size: 1.15em;
+        color: #444;
+      }
+
+      .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 26px;
+      }
+
+      .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: 0.4s;
+        border-radius: 26px;
+      }
+
+      .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 20px;
+        width: 20px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+      }
+
+      input:checked + .toggle-slider {
+        background-color: #007aff;
+      }
+
+      input:checked + .toggle-slider:before {
+        transform: translateX(24px);
+      }
+
+      .navigation {
+        padding-top: 25px; /* Adjust top padding for separation */
+        border-top: 1px solid #eee; /* Separator line */
+        flex-shrink: 0; /* Prevent shrinking */
+        margin-top: auto; /* Push to bottom of container */
+      }
+
+      .next-button {
+        padding: 14px 28px; /* Slightly larger padding */
+        border: none;
+        border-radius: 10px; /* Consistent rounded corners */
+        font-size: 1.05em;
+        font-weight: 600; /* Bolder text */
+        cursor: pointer;
+        background-color: #007aff; /* iOS blue */
+        color: white;
+        transition: background-color 0.2s ease, transform 0.1s ease;
+        width: 100%;
+        text-align: center;
+      }
+
+      .next-button:hover {
+        background-color: #005ecb; /* 통일된 호버 색상 */
+      }
+
+      .next-button:active {
+        transform: scale(0.98);
+      }
+
+      .info-text {
+        font-size: 0.95em;
+        color: #666;
+        margin-top: 10px;
+        padding: 8px 12px;
+        line-height: 1.4;
+        background-color: #f0f7ff;
+        border-radius: 8px;
+        border-left: 4px solid #007aff;
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .info-text::before {
+        content: "ⓘ";
+        color: #007aff;
+        font-size: 1.1em;
+        font-weight: bold;
+        margin-right: 8px;
+        flex-shrink: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="screen-title">게임 준비</h1>
+
+      <div class="setup-section">
+        <h2 class="setup-title">참여 인원 선택</h2>
+        <div class="player-count-control">
+          <button
+            id="decrease-button"
+            class="arrow-button"
+            aria-label="인원수 감소"
+          >
+            &lt;
+          </button>
+          <span id="player-count">3</span>
+          <button
+            id="increase-button"
+            class="arrow-button"
+            aria-label="인원수 증가"
+          >
+            &gt;
+          </button>
+        </div>
+      </div>
+
+      <div class="setup-section">
+        <h2 class="setup-title">게임 모드 선택</h2>
+        <div class="game-mode-control">
+          <button id="loser-mode" class="game-mode-button active">
+            패자 결정
+          </button>
+          <button id="winner-mode" class="game-mode-button">승자 결정</button>
+        </div>
+        <p class="info-text">
+          <span id="game-mode-description"
+            >패자 결정: 가장 낮은 점수를 획득한 플레이어가 패자가 됩니다.</span
+          >
+        </p>
+      </div>
+
+      <div class="setup-section">
+        <h2 class="setup-title">게임 설정</h2>
+        <div class="toggle-container">
+          <span class="toggle-label">동점자 재경기</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="rematch-toggle" checked />
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <p class="info-text">
+          동점자가 발생할 경우 재경기를 진행할지 여부를 설정합니다. 재경기를
+          하지 않을 경우 여러 승자/패자가 발생할 수 있습니다.
+        </p>
+      </div>
+
+      <div class="navigation">
+        <button id="next-button" class="next-button">다음</button>
+      </div>
+    </div>
+
+    <!-- 외부 JavaScript 파일 연결 -->
+    <script>
+      // game_preparation_screen.js
+      document.addEventListener("DOMContentLoaded", () => {
+        const playerCountElement = document.getElementById("player-count");
+        const decreaseButton = document.getElementById("decrease-button");
+        const increaseButton = document.getElementById("increase-button");
+        const nextButton = document.getElementById("next-button");
+        const loserModeButton = document.getElementById("loser-mode");
+        const winnerModeButton = document.getElementById("winner-mode");
+        const rematchToggle = document.getElementById("rematch-toggle");
+
+        const MIN_PLAYERS = 2;
+        const MAX_PLAYERS = 6;
+        let currentPlayers = 3; // 초기값 설정
+        let gameMode = "loser"; // 초기값: 패자 결정 모드
+        let rematchEnabled = true; // 초기값: 재경기 가능
+
+        function updateDisplay() {
+          if (playerCountElement) {
+            playerCountElement.textContent = currentPlayers;
+          }
+          // 최소/최대 인원에 따른 버튼 비활성화 처리
+          if (decreaseButton) {
+            decreaseButton.disabled = currentPlayers <= MIN_PLAYERS;
+          }
+          if (increaseButton) {
+            increaseButton.disabled = currentPlayers >= MAX_PLAYERS;
+          }
+        }
+
+        if (decreaseButton) {
+          decreaseButton.addEventListener("click", () => {
+            if (currentPlayers > MIN_PLAYERS) {
+              currentPlayers--;
+              updateDisplay();
+            }
+          });
+        }
+
+        if (increaseButton) {
+          increaseButton.addEventListener("click", () => {
+            if (currentPlayers < MAX_PLAYERS) {
+              currentPlayers++;
+              updateDisplay();
+            }
+          });
+        }
+
+        // 게임 모드 선택 버튼 이벤트 처리
+        if (loserModeButton && winnerModeButton) {
+          const gameModeDescription = document.getElementById(
+            "game-mode-description"
+          );
+
+          loserModeButton.addEventListener("click", () => {
+            loserModeButton.classList.add("active");
+            winnerModeButton.classList.remove("active");
+            gameMode = "loser";
+            gameModeDescription.textContent =
+              "패자 결정: 가장 낮은 점수를 획득한 플레이어가 패자가 됩니다.";
+          });
+
+          winnerModeButton.addEventListener("click", () => {
+            winnerModeButton.classList.add("active");
+            loserModeButton.classList.remove("active");
+            gameMode = "winner";
+            gameModeDescription.textContent =
+              "승자 결정: 가장 높은 점수를 획득한 플레이어가 승자가 됩니다.";
+          });
+        }
+
+        // 재경기 토글 이벤트 처리
+        if (rematchToggle) {
+          rematchToggle.addEventListener("change", () => {
+            rematchEnabled = rematchToggle.checked;
+          });
+        }
+
+        // '다음' 버튼 클릭 시 (간단한 예시, 실제 앱에서는 화면 전환 로직 필요)
+        if (nextButton) {
+          nextButton.addEventListener("click", () => {
+            // 게임 설정 정보 저장 또는 전달
+            const gameSettings = {
+              players: currentPlayers,
+              gameMode: gameMode,
+              rematchEnabled: rematchEnabled,
+            };
+
+            console.log("게임 설정:", gameSettings);
+            alert(
+              `${currentPlayers}명, ${
+                gameMode === "winner" ? "승자" : "패자"
+              } 결정 모드${
+                rematchEnabled ? ", 재경기 가능" : ""
+              }으로 게임을 시작합니다! (캐릭터 분배 화면으로 이동)`
+            );
+            // TODO: 실제 네비게이션 로직 구현 (예: window.location.href = 'character_assignment.html';)
+          });
+        }
+
+        // 페이지 로드 시 초기 상태 업데이트
+        updateDisplay();
+      });
+    </script>
+  </body>
+</html>
