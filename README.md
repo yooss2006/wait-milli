@@ -1,50 +1,39 @@
-# Welcome to your Expo app 👋
+# WAIT-MILLI (스톱밀리)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## 프로젝트 개요
 
-## Get started
+콩콩팥팥 TV 프로그램에서 영감을 받은 모바일 스톱워치 게임입니다. 플레이어는 두 번의 스톱워치 멈춤으로 얻은 숫자의 뒷자리를 곱하여 가장 높은 점수를 얻는 것을 목표로 합니다.
 
-1. Install dependencies
+## 핵심 기능
 
-   ```bash
-   npm install
-   ```
+- 인원수 설정 (최소 2명, 최대 8명)
+- 참가자별 랜덤 동물 캐릭터 분배
+- 밀리초 기반 스톱워치 게임 진행
+- 점수 계산 및 실시간 표시
+- 최종 승자 발표
 
-2. Start the app
+## 게임 진행 방식
 
-   ```bash
-    npx expo start
-   ```
+1. 게임 준비 화면에서 인원수와 게임 규칙 설정
+2. 각 참가자에게 랜덤 동물 캐릭터 배정
+3. 스톱워치를 두 번 정지하여 밀리초 뒷자리 숫자 기록
+4. 두 숫자를 곱하여 참가자 점수 계산
+5. 모든 참가자 게임 완료 후 승자/패자 발표
 
-In the output, you'll find options to open the app in a
+## 기술 스택
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- React Native 기반 모바일 애플리케이션
+- Expo 개발 도구
+- React Navigation을 이용한 화면 전환
+- Zustand를 통한 상태 관리
+- Lottie를 활용한 애니메이션 효과
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+## 설치 및 실행 방법
 
 ```bash
-npm run reset-project
+# 패키지 설치
+pnpm install
+
+# 개발 서버 실행
+pnpm start
 ```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
