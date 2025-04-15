@@ -5,31 +5,34 @@
 ### 폴더 구조
 
 ```
-src/
-├── components/            # 재사용 컴포넌트
-│   ├── common/            # 공통 컴포넌트
-│   ├── gamePreparation/   # 게임 준비 화면 컴포넌트
-│   ├── characterAssignment/ # 캐릭터 분배 화면 컴포넌트
-│   ├── gameplay/          # 게임 진행 화면 컴포넌트
-│   └── result/            # 결과 화면 컴포넌트
-├── screens/               # 앱 화면
-│   ├── GamePreparationScreen.jsx
-│   ├── CharacterAssignmentScreen.jsx
-│   ├── GameplayScreen.jsx
-│   └── ResultScreen.jsx
-├── contexts/              # 상태 관리
-│   ├── GameSettingsContext.jsx
-│   └── PlayersContext.jsx
-├── hooks/                 # 커스텀 훅
-│   ├── useStopwatch.js
-│   └── useGameLogic.js
-├── utils/                 # 유틸리티 함수
-│   ├── scoreCalculation.js
-│   └── characterGenerator.js
-├── constants/             # 상수 정의
-│   ├── gameConstants.js
-│   └── theme.js
-└── App.jsx                # 앱 진입점
+app/                      # Expo Router 기반 파일 라우팅
+├── (game)/               # 게임 관련 스크린 그룹
+│   ├── preparation.tsx   # 게임 준비 화면
+│   ├── assignment.tsx    # 캐릭터 분배 화면
+│   ├── gameplay.tsx      # 게임 진행 화면
+│   ├── result.tsx        # 결과 화면
+│   └── _layout.tsx       # 게임 스크린 공통 레이아웃
+├── index.tsx             # 시작 화면
+├── _layout.tsx           # 앱 루트 레이아웃
+components/               # 재사용 컴포넌트
+├── common/               # 공통 컴포넌트
+├── gamePreparation/      # 게임 준비 화면 컴포넌트
+├── characterAssignment/  # 캐릭터 분배 화면 컴포넌트
+├── gameplay/             # 게임 진행 화면 컴포넌트
+└── result/               # 결과 화면 컴포넌트
+contexts/                 # 상태 관리
+├── GameSettingsContext.tsx
+└── PlayersContext.tsx
+hooks/                    # 커스텀 훅
+├── useStopwatch.ts
+└── useGameLogic.ts
+utils/                    # 유틸리티 함수
+├── scoreCalculation.ts
+└── characterGenerator.ts
+constants/                # 상수 정의
+├── gameConstants.ts
+└── theme.ts
+assets/                   # 이미지, 폰트 등 정적 자원
 ```
 
 ## 2. UI 컴포넌트 구현
@@ -139,8 +142,8 @@ src/
 ### 1단계: 기본 구조 및 내비게이션 설정
 
 - [ ] 프로젝트 초기화 및 폴더 구조 설정
-- [ ] React Navigation 설정
-- [ ] 기본 화면 구성
+- [ ] Expo Router 설정
+- [ ] 기본 화면 레이아웃 구성
 
 ### 2단계: 공통 컴포넌트 개발
 
