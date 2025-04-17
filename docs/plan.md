@@ -25,10 +25,10 @@
 
 ### 2.3. 캐릭터 배정 화면
 
-- **CharacterAssignmentList**: 각 참가자별 캐릭터 정보(이름, 캐릭터, 그리드 레이아웃)
-- **AssignmentGuide**: 안내 문구
-- **PrevButton**: 이전 단계로 이동 버튼
-- **NextButton**: 다음 단계로 이동 버튼
+- **CharacterAssignmentList**: 각 참가자별 캐릭터 정보(이름, 캐릭터, 그리드 레이아웃) ✅
+- **AssignmentGuide**: 안내 문구 ✅
+- **PrevButton**: 이전 단계로 이동 버튼 ✅
+- **NextButton**: 다음 단계로 이동 버튼 ✅
 
 ### 2.4. 게임 플레이 화면
 
